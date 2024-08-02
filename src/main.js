@@ -1,43 +1,35 @@
-import { createApp, h } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
 import App from './App.vue'
-
 import NotFound from './components/NotFound.vue'
-import Moves from './components/Moves.vue'
+import Admin from './components/Admin.vue'
+import Landing from './components/Landing.vue'
 
 import PrimeVue from 'primevue/config';
 
 import 'primevue/resources/themes/aura-dark-green/theme.css'
+import 'primeicons/primeicons.css'
 import './style.css'
 
 const pinia = createPinia()
 
-const routes = {
-    '/': App,
-    '/moves': Moves
-}
+const routes = [
+    { path: '/', component: Landing },
+    { path: '/admin', component: Admin },
+    { path: '/:catchAll(.*)', name: 'not-found', component: NotFound },
+]
 
-const SimpleRouter = {
-    data: () => ({
-        currentRoute: window.location.pathname
-    }),
+const router = createRouter({
+    history: createWebHistory(),
+    routes,
+})
 
-    computed: {
-        CurrentComponent() {
-            return routes[this.currentRoute] || NotFound
-        }
-    },
+const app = createApp(App)
 
-    render() {
-        return h(this.CurrentComponent)
-    }
-}
-
-const app = createApp(SimpleRouter)
-
+app.use(router)
 app.use(pinia)
 app.use(PrimeVue)
-app
 
 app.mount('#app')

@@ -3,13 +3,15 @@ import { ref } from 'vue';
 import defaultMoves from '../data/moves';
 
 export const useMoveStore = defineStore('moveStore', () => {
+
     const visible = ref(false);
-    const createVisible = ref(false)
     const editImage = ref(false)
+    const createVisible = ref(false)
 
     const selectedMove = ref({});
 
     const moves = ref(defaultMoves);
+
 
     const openClose = () => {
         createVisible.value = false
@@ -29,20 +31,18 @@ export const useMoveStore = defineStore('moveStore', () => {
         moves.value = newMoves;
     };
 
-    const removeMoveById = () => {
-        setMoves(moves.value.filter((move) => move.id !== selectedMove.value.id));
-        openClose()
+    const removeMoveById = (id) => {
+        setMoves(moves.value.filter((move) => move.id !== id));
     };
 
     const addMove = (move) => {
         setMoves([...moves.value, move]);
-        openCloseCreate()
     };
 
     const editMove = (move) => {
         const movesMinusChanged = moves.value.filter((m) => m.id !== move.id);
+
         setMoves([...movesMinusChanged, move]);
-        openClose()
     };
 
     const setSelectedMove = (move) => {

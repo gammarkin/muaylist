@@ -44,7 +44,7 @@
 	const triedToSave = ref(false);
 
 	const goToMoveId = (product) => {
-		router.push(`admin/product/${product.data?.id}`);
+		router.push(`admin/move/${product.data?.id}`);
 	};
 
 	const showCreate = () => {

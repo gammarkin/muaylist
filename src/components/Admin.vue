@@ -1,25 +1,38 @@
 <script setup>
 	import {ref} from 'vue';
 	import {useRouter} from 'vue-router';
+	import {useToast} from 'primevue/usetoast';
 
+	import SelectButton from 'primevue/selectbutton';
+	import FloatLabel from 'primevue/floatlabel';
+	import FileUpload from 'primevue/fileupload';
 	import InputText from 'primevue/inputtext';
 	import DataTable from 'primevue/datatable';
 	import Textarea from 'primevue/textarea';
+	import Divider from 'primevue/divider';
 	import Button from 'primevue/button';
 	import Column from 'primevue/column';
 	import Dialog from 'primevue/dialog';
+	import Toast from 'primevue/toast';
 
 	import {useMoveStore} from '../stores/moveStore';
 
+	document.title = 'Admin list';
+
 	const moveStore = useMoveStore();
 	const router = useRouter();
+
+	const toast = useToast();
 
 	const createDefaultMove = () => ({
 		id: moveStore.moves.length + 1,
 		src: '',
 		name: '',
 		desc: '',
+		category: '',
 	});
+
+	const options = ref(['fist', 'kick', 'knee', 'elbow', 'other']);
 
 	const handleImageError = (event) => {
 		const fallbackImage =
@@ -28,26 +41,53 @@
 	};
 
 	const newMove = ref(createDefaultMove());
+	const triedToSave = ref(false);
 
-	const showProduct = (product) => {
-		newMove.value = {...newMove.value, ...product.data};
-
-		moveStore.setSelectedMove(product.data);
-		moveStore.openClose();
+	const goToMoveId = (product) => {
+		router.push(`admin/product/${product.data?.id}`);
 	};
 
 	const showCreate = () => {
 		newMove.value = createDefaultMove();
+		triedToSave.value = false;
 
 		moveStore.openCloseCreate();
 	};
 
 	const create = () => {
+		triedToSave.value = true;
+
+		if (Object.values(newMove.value).some((value) => !value))
+			// checks if some value is empty
+			return toast.add({
+				severity: 'error',
+				summary: 'Error',
+				detail:
+					'Por favor, complete todos los campos antes de crear un nuevo movimiento.',
+				life: 3000,
+			});
+
 		moveStore.addMove(newMove.value);
+
+		showCreate();
 	};
 
 	const changeToLanding = () => {
 		router.push('/');
+	};
+
+	const customBase64Uploader = async (event) => {
+		const file = event.files[0];
+		const reader = new FileReader();
+		let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
+
+		reader.readAsDataURL(blob);
+
+		reader.onloadend = function () {
+			const base64data = reader.result;
+
+			newMove.value.src = base64data;
+		};
 	};
 </script>
 
@@ -76,50 +116,97 @@
 		<DataTable
 			selectionMode="single"
 			size="large"
-			:value="moveStore.moves"
+			:value="moveStore.moves.sort((a, b) => a.id - b.id)"
 			tableStyle="width: 100vw"
-			@row-click="showProduct"
+			@row-click="goToMoveId"
 		>
 			<Column field="id" header="Id"></Column>
-			<Column field="name" header="Name"></Column>
-			<Column field="desc" header="Description"></Column>
+			<Column field="name" header="Nombre"></Column>
+			<Column field="desc" header="Descripción"></Column>
 		</DataTable>
 
 		<!-- create card start -->
 		<Dialog v-model:visible="moveStore.createVisible" modal>
 			<div class="d-flex-column">
-				<label class="mb-1" for="src">src</label>
+				<label class="mb-1" for="src">Imagen</label>
 
-				<div class="container-flex-between">
-					<InputText type="text" class="mb-1" v-model="newMove.src" id="src">
-						{{ newMove?.name }}
-					</InputText>
+				<div class="d-flex-column">
+					<div>
+						<Toast />
 
-					<img
-						@error="handleImageError"
-						:alt="newMove?.name"
-						:src="newMove?.src"
-						class="mx-1 w-50"
-					/>
+						<FileUpload
+							mode="basic"
+							name="demo[]"
+							@uploader="customBase64Uploader"
+							accept="image/*"
+							:maxFileSize="1000000"
+							customUpload
+							auto
+							style="width: 100%"
+							chooseLabel="Eligir"
+						/>
+					</div>
+
+					<Divider layout="horizontal" class="flex md:hidden"
+						><b>OR</b>
+					</Divider>
+
+					<div class="container-flex-between">
+						<InputText
+							placeholder="Inserta la URL de la imagen"
+							type="text"
+							class="mb-1"
+							v-model="newMove.src"
+							id="src"
+							:invalid="!newMove.src && triedToSave"
+						>
+							{{ newMove?.name }}
+						</InputText>
+
+						<img
+							@error="handleImageError"
+							:alt="newMove?.name"
+							:src="newMove?.src"
+							class="mx-1 w-50"
+						/>
+					</div>
 				</div>
 			</div>
 
 			<div class="d-flex-column">
-				<label class="mb-1" for="name">name</label>
+				<FloatLabel class="my-1">
+					<InputText
+						placeholder="Insert move name here"
+						id="name"
+						type="text"
+						v-model="newMove.name"
+						:invalid="!newMove.name && triedToSave"
+						>{{ moveStore.selectedMove?.name }}
+					</InputText>
+					<label for="name">Nombre del golpe</label>
+				</FloatLabel>
 
-				<InputText
-					id="name"
-					type="text"
-					v-model="newMove.name"
-					:invalid="newMove.name === null"
-					>{{ moveStore.selectedMove?.name }}
-				</InputText>
+				<FloatLabel class="my-1">
+					<Textarea
+						placeholder="Insert move Description here"
+						id="desc"
+						v-model="newMove.desc"
+						rows="5"
+						cols="30"
+						:invalid="!newMove.desc && triedToSave"
+					>
+						{{ newMove.desc }}
+					</Textarea>
+					<label for="desc">descripción del golpe</label>
+				</FloatLabel>
 
-				<label class="my-1" for="desc">description</label>
-
-				<Textarea id="desc" v-model="newMove.desc" rows="5" cols="30">
-					{{ newMove.desc }}
-				</Textarea>
+				<label class="mb-1" for="cat">Categoría</label>
+				<SelectButton
+					:options="options"
+					:invalid="!newMove.category && triedToSave"
+					v-model="newMove.category"
+					aria-labelledby="basic"
+				/>
 			</div>
 
 			<template #footer>
@@ -130,59 +217,6 @@
 		</Dialog>
 
 		<!-- create end -->
-
-		<!-- edit and delete cards start -->
-		<Dialog v-model:visible="moveStore.visible" modal>
-			<template #header>
-				<img
-					class="edit-image"
-					:alt="moveStore.selectedMove?.name + ' move'"
-					:src="newMove.src"
-					@click="moveStore.openCloseChangeImage"
-					@error="handleImageError"
-				/>
-
-				<InputText
-					class="mx-1"
-					v-if="moveStore.editImage"
-					type="text"
-					v-model="newMove.src"
-					:invalid="newMove.src == ''"
-					>{{ moveStore.selectedMove?.src }}</InputText
-				>
-			</template>
-
-			<div class="d-flex-column">
-				<InputText
-					type="text"
-					v-model="newMove.name"
-					:invalid="newMove.name == ''"
-					>{{ moveStore.selectedMove?.name }}
-				</InputText>
-
-				<Textarea v-model="newMove.desc" rows="5" cols="30">
-					{{ moveStore.selectedMove?.desc }}
-				</Textarea>
-			</div>
-
-			<template #footer>
-				<div class="flex gap-4 mt-1">
-					<Button
-						label="Guardar"
-						class="mx-1"
-						@click="moveStore.editMove(newMove)"
-					/>
-
-					<Button
-						label="Eliminar"
-						severity="danger"
-						:onclick="moveStore.removeMoveById"
-					/>
-				</div>
-			</template>
-		</Dialog>
-
-		<!-- edit and delete cards end -->
 	</div>
 </template>
 
@@ -219,14 +253,6 @@
 		width: 2%;
 		margin: 1rem 0.4rem;
 	}
-	.edit-image {
-		max-width: 35rem;
-	}
-
-	.edit-image:hover {
-		cursor: pointer;
-	}
-
 	.d-flex-column {
 		display: flex;
 		flex-direction: column;

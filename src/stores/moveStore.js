@@ -40,9 +40,13 @@ export const useMoveStore = defineStore('moveStore', () => {
     };
 
     const editMove = (move) => {
+        if (move.id > moves.value.length + 1) {
+            return addMove(move);
+        }
+
         const movesMinusChanged = moves.value.filter((m) => m.id !== move.id);
 
-        setMoves([...movesMinusChanged, move]);
+        return setMoves([...movesMinusChanged, move]);
     };
 
     const setSelectedMove = (move) => {

@@ -1,17 +1,17 @@
 export default [
     {
-        name: 'Beginner',
-        desc: 'Learn the fundamentals of Muay Thai in a supportive environment.',
+        name: 'Principiante',
+        desc: 'Aprende los fundamentos del Muay Thai en un ambiente de apoyo.',
         category: 'beginner',
     },
     {
-        name: 'Intermediate',
-        desc: 'Take your Muay Thai skills to the next lever with our intermediate classes.',
+        name: 'Intermedio',
+        desc: 'Lleva tus habilidades de Muay Thai al siguiente nivel con nuestras clases intermedias.',
         category: 'intermediate',
     },
     {
-        name: 'Advanced',
-        desc: 'Challenge yourself with our advanced Muay Thai classes and reach your full potential.',
+        name: 'Avanzado',
+        desc: 'Rétate a ti mismo con nuestras clases avanzadas de Muay Thai y alcanza tu máximo potencial.',
         category: 'advanced',
     }
 ]

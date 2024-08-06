@@ -34,9 +34,34 @@
 	const router = useRouter();
 
 	const search = ref('');
-	const category = ref('');
+	const category = ref({name: 'todos', value: 'all'});
 
-	const options = ref(['fist', 'kick', 'knee', 'elbow', 'other']);
+	const options = ref([
+		{
+			value: 'all',
+			name: 'todos',
+		},
+		{
+			value: 'fist',
+			name: 'puño',
+		},
+		{
+			value: 'kick',
+			name: 'patada',
+		},
+		{
+			value: 'knee',
+			name: 'rodilla',
+		},
+		{
+			value: 'elbow',
+			name: 'codo',
+		},
+		{
+			value: 'other',
+			name: 'otros',
+		},
+	]);
 
 	const navigateToAdmin = () => {
 		numberOfTimesClicked.value += 1;
@@ -78,7 +103,7 @@
 			<div class="flex">
 				<Button
 					@click="scrollToSection('techniques')"
-					label="Techniques"
+					label="Técnicas"
 					text
 					plain
 					severity="contrast"
@@ -92,14 +117,14 @@
 				/>
 				<Button
 					@click="scrollToSection('classes')"
-					label="Classes"
+					label="Clases"
 					text
 					plain
 					severity="contrast"
 				/>
 				<Button
 					@click="scrollToSection('contact')"
-					label="Contact"
+					label="Contacto"
 					text
 					severity="contrast"
 				/>
@@ -110,14 +135,14 @@
 			<Badge
 				style="margin: 1rem"
 				severity="secondary"
-				value="Muay Thai Techniques"
+				value="Técnicas de Muay Thai"
 			></Badge>
 
-			<p class="h1">Master the Art of Muay Thai</p>
+			<p class="h1">Domina el Arte del Muay Thai</p>
 
 			<p class="h2 color-muted">
-				Explore a wide range of Muay Thai techniques and learn from our expert
-				instructors.
+				Nuestros instructores expertos te guiarán a través de los fundamentos y
+				las técnicas avanzadas del Muay Thai.
 			</p>
 
 			<Toolbar>
@@ -128,7 +153,7 @@
 						type="text"
 						v-model="search"
 						class="mx-1"
-						placeholder="Nombre del golpe"
+						placeholder="Golpe"
 					/>
 				</template>
 
@@ -137,6 +162,8 @@
 						:options="options"
 						v-model="category"
 						aria-labelledby="basic"
+						optionLabel="name"
+						@error="category = options[0]"
 					/>
 				</template>
 			</Toolbar>
@@ -145,21 +172,25 @@
 				<Card
 					@click="showProduct(move)"
 					v-for="move in getMoves().filter((move) => {
-						if (!search && !category) {
+						if (!search && (!category || category.value === 'all')) {
 							return true;
 						}
 
-						if (search && !category) {
-							return move.name.toLowerCase().includes(search.toLowerCase());
+						if (search && (!category || category.value === 'all')) {
+							return (
+								move.name.toLowerCase().includes(search.toLowerCase()) ||
+								move.desc.toLowerCase().includes(search.toLowerCase())
+							);
 						}
 
-						if (category && !search) {
-							return move.category === category;
+						if (category.value && !search) {
+							return move.category === category.value;
 						}
 
 						return (
-							move.category === category &&
-							move.name.toLowerCase().includes(search.toLowerCase())
+							move.category === category.value &&
+							(move.name.toLowerCase().includes(search.toLowerCase()) ||
+								move.desc.toLowerCase().includes(search.toLowerCase()))
 						);
 					})"
 					class="card"
@@ -191,20 +222,20 @@
 
 		<section class="about" id="about">
 			<div class="about-texts">
-				<p class="about-text">About Muay Thai Academy</p>
+				<p class="about-text">Acerca de la Academia de Muay Thai</p>
 
 				<p class="about-desc color-muted">
-					At Muay Thai Academy, we are dedicated to preserving the rich
-					tradition of Muay Thai while providing world-class training to
-					students of all levels.
+					En la Academia de Muay Thai, estamos dedicados a preservar la rica
+					tradición del Muay Thai mientras ofrecemos entrenamiento de clase
+					mundial a estudiantes de todos los niveles.
 				</p>
 			</div>
 
 			<div class="about-buttons">
-				<Button class="mb-1" label="Learn More" severity="contrast" />
+				<Button class="mb-1" label="Aprende más" severity="contrast" />
 
 				<Button
-					label="Join Now"
+					label="Únete ahora"
 					severity="secondary"
 					style="background-color: hsl(240, 3.2%, 6.1%)"
 				/>
@@ -215,13 +246,13 @@
 			<Badge
 				style="margin: 1rem"
 				severity="secondary"
-				value="Muay Thai Classes"
+				value="Clases de Muay Thai"
 			></Badge>
 
-			<p class="h1">Train with the Best</p>
+			<p class="h1">Entrena con los Mejores</p>
 			<p class="h2 color-muted">
-				Our expert instructors will guide you through the fundamentals and
-				advanced techniques of Muay Thai.
+				Nuestros instructores expertos te guiarán a través de los fundamentos y
+				las técnicas avanzadas del Muay Thai.
 			</p>
 
 			<div class="cards-class">
@@ -240,16 +271,12 @@
 
 					<template #footer>
 						<p class="desc color-muted">
-							{{
-								classItem.desc.length > MAX_CHAR_LENGHT
-									? classItem.desc.slice(0, MAX_CHAR_LENGHT) + '...'
-									: classItem.desc
-							}}
+							{{ classItem.desc }}
 						</p>
 
 						<Button
 							class="button-classes"
-							label="Join Now"
+							label="Aprende más"
 							severity="contrast"
 						/>
 					</template>
@@ -258,11 +285,12 @@
 		</section>
 
 		<section class="contact" id="contact">
-			<p class="h1">Get in Touch</p>
+			<p class="h1">Ponte en Contacto</p>
 
 			<p class="h2 color-muted" style="width: 35%">
-				Have questions or want to learn more about our Muay Thai classes?
-				<a class="mouse-over">Contact us</a> today!
+				¿Tienes preguntas o quieres saber más sobre nuestras clases de Muay
+				Thai?
+				<a class="mouse-over">¡Contáctanos</a> hoy!
 			</p>
 		</section>
 	</div>
@@ -270,30 +298,20 @@
 	<!-- cards start -->
 
 	<Dialog
-		style="
-			width: 40%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		"
+		:header="moveStore.selectedMove?.name"
 		v-model:visible="moveStore.visible"
 		modal
+		style="width: 30%"
 	>
-		<template #header>
-			<img
-				class="edit-image"
-				:alt="moveStore.selectedMove?.name + ' move'"
-				:src="moveStore.selectedMove?.src"
-			/>
-		</template>
+		<img
+			class="edit-image"
+			:alt="moveStore.selectedMove?.name + ' move'"
+			:src="moveStore.selectedMove?.src"
+		/>
 
-		<div class="d-flex-column">
-			<p class="name mb-1">{{ moveStore.selectedMove?.name }}</p>
-
-			<p class="desc wrap">
-				{{ moveStore.selectedMove?.desc }}
-			</p>
-		</div>
+		<p class="wrap">
+			{{ moveStore.selectedMove?.desc }}
+		</p>
 	</Dialog>
 
 	<!-- cards end -->
@@ -308,6 +326,11 @@
 
 	body::-webkit-scrollbar {
 		display: none; /* for Chrome, Safari, and Opera */
+	}
+	.wrap {
+		display: flex;
+		flex-wrap: wrap;
+		margin: 2rem 0rem;
 	}
 
 	.header {
@@ -395,11 +418,12 @@
 		text-align: center;
 		border: hsl(240, 7.1%, 22%) 1px solid;
 		font-family: 'Manrope', sans-serif;
+		min-height: 15rem;
 	}
 
 	.card:hover {
 		transform: scale(1.05);
-		transition: ease-out;
+		transition: all 1 ease;
 	}
 
 	.image {
@@ -433,13 +457,9 @@
 	.color-muted {
 		color: hsl(60, 5.3%, 85.1%);
 	}
-
-	.content {
-		padding: 0;
-	}
-
 	.edit-image {
 		max-width: 35rem;
+		width: 100%;
 	}
 
 	.d-flex-column {

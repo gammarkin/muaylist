@@ -16,14 +16,14 @@
 		0
 	);
 
-	const isCreatePage =
-		id < lastIdFromMoves + 1 && !moveStore.moves.some((move) => move.id == id);
+	const isEditPage =
+		id < lastIdFromMoves + 1 && moveStore.moves.some((move) => move.id == id);
 
 	if (!id) {
 		id = lastIdFromMoves + 1;
 	}
 
-	if (!isCreatePage) {
+	if (isEditPage) {
 		// get the bigger id an add one to be the last from arr
 		moveName = moveStore.moves.find((m) => m.id == id).name;
 	} else {

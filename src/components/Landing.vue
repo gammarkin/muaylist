@@ -12,6 +12,7 @@
 	import {useMoveStore} from '../stores/moveStore';
 
 	import classes from '../data/classes';
+	import options from '../data/options';
 
 	document.title = 'Muay thai academy';
 
@@ -35,33 +36,6 @@
 
 	const search = ref('');
 	const category = ref({name: 'todos', value: 'all'});
-
-	const options = ref([
-		{
-			value: 'all',
-			name: 'todos',
-		},
-		{
-			value: 'fist',
-			name: 'puño',
-		},
-		{
-			value: 'kick',
-			name: 'patada',
-		},
-		{
-			value: 'knee',
-			name: 'rodilla',
-		},
-		{
-			value: 'elbow',
-			name: 'codo',
-		},
-		{
-			value: 'other',
-			name: 'otros',
-		},
-	]);
 
 	const navigateToAdmin = () => {
 		numberOfTimesClicked.value += 1;
@@ -419,11 +393,11 @@
 		border: hsl(240, 7.1%, 22%) 1px solid;
 		font-family: 'Manrope', sans-serif;
 		min-height: 15rem;
+		transition: transform 1 ease;
 	}
 
 	.card:hover {
 		transform: scale(1.05);
-		transition: all 1 ease;
 	}
 
 	.image {

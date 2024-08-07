@@ -11,6 +11,7 @@ import NotFound from './components/NotFound.vue'
 
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
+import ConfirmService from 'primevue/confirmationservice'
 
 import 'primevue/resources/themes/aura-dark-green/theme.css'
 import 'primeicons/primeicons.css'
@@ -36,5 +37,6 @@ app.use(router);
 app.use(pinia);
 app.use(PrimeVue);
 app.use(ToastService);
+app.use(ConfirmService)
 
 app.mount('#app');

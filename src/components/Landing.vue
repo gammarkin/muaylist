@@ -119,7 +119,7 @@
 				las técnicas avanzadas del Muay Thai.
 			</p>
 
-			<Toolbar>
+			<Toolbar class="toolbar">
 				<template #center>
 					<i class="pi pi-search" />
 
@@ -173,7 +173,13 @@
 						<img
 							class="image"
 							:alt="move.name + ' image'"
-							:src="iconCategory[move.category || 'other']"
+							:src="
+								iconCategory[
+									typeof move.category === 'object'
+										? move.category.value
+										: move.category || 'other'
+								]
+							"
 						/>
 					</template>
 
@@ -497,5 +503,7 @@
 	}
 	.mouse-over:hover {
 		cursor: pointer;
+	}
+	@media screen and (max-width: 1136) {
 	}
 </style>

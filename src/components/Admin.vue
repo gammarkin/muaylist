@@ -26,6 +26,10 @@
 	const changeToLanding = () => {
 		router.push('/');
 	};
+
+	const onRowReorder = (event) => {
+		moveStore.setMoves(event.value);
+	};
 </script>
 
 <template>
@@ -51,12 +55,15 @@
 		</div>
 
 		<DataTable
-			selectionMode="single"
 			size="large"
-			:value="moveStore.moves.sort((a, b) => a.id - b.id)"
 			tableStyle="width: 100vw"
+			:value="moveStore.moves"
+			:reorderableColumns="true"
 			@row-click="goToMoveId"
+			@rowReorder="onRowReorder"
+			@row-reorder="onRowReorder"
 		>
+			<Column rowReorder headerStyle="width: 3rem" :reorderableColumn="false" />
 			<Column field="id" header="Id"></Column>
 			<Column field="name" header="Nombre"></Column>
 			<Column field="desc" header="Descripción"></Column>

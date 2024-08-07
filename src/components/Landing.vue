@@ -7,7 +7,7 @@
 	import InputText from 'primevue/inputtext';
 	import SelectButton from 'primevue/selectbutton';
 
-	import {ref} from 'vue';
+	import {ref, onMounted, onUnmounted} from 'vue';
 	import {useRouter} from 'vue-router';
 	import {useMoveStore} from '../stores/moveStore';
 
@@ -30,12 +30,13 @@
 	};
 
 	const numberOfTimesClicked = ref(0);
+	const search = ref('');
 
 	const moveStore = useMoveStore();
 	const router = useRouter();
 
-	const search = ref('');
 	const category = ref({name: 'todos', value: 'all'});
+	const windowWidth = ref(window.innerWidth);
 
 	const navigateToAdmin = () => {
 		numberOfTimesClicked.value += 1;
@@ -60,6 +61,18 @@
 			element.scrollIntoView({behavior: 'smooth'});
 		}
 	};
+
+	const updateWindowWidth = () => {
+		windowWidth.value = window.innerWidth;
+	};
+
+	onMounted(() => {
+		window.addEventListener('resize', updateWindowWidth);
+	});
+
+	onUnmounted(() => {
+		window.removeEventListener('resize', updateWindowWidth);
+	});
 </script>
 
 <template>
@@ -67,7 +80,7 @@
 		<header class="header">
 			<Button
 				icon="pi pi-star-fill"
-				label="Muay Thai Academy"
+				:label="windowWidth < 520 ? '' : 'Muay Thai Academy'"
 				text
 				plain
 				severity="contrast"
@@ -126,7 +139,7 @@
 					<InputText
 						type="text"
 						v-model="search"
-						class="mx-1"
+						class="mx-1 input-search"
 						placeholder="Golpe"
 					/>
 				</template>
@@ -265,9 +278,9 @@
 		</section>
 
 		<section class="contact" id="contact">
-			<p class="h1">Ponte en Contacto</p>
+			<p class="h1 desc-h1">Ponte en Contacto</p>
 
-			<p class="h2 color-muted" style="width: 35%">
+			<p class="h2 color-muted desc-contact">
 				¿Tienes preguntas o quieres saber más sobre nuestras clases de Muay
 				Thai?
 				<a class="mouse-over">¡Contáctanos</a> hoy!
@@ -485,6 +498,10 @@
 		width: 35vw;
 	}
 
+	.desc-contact {
+		width: 35%;
+	}
+
 	.contact {
 		display: flex;
 		flex-direction: column;
@@ -504,6 +521,40 @@
 	.mouse-over:hover {
 		cursor: pointer;
 	}
-	@media screen and (max-width: 1136) {
+	@media screen and (max-width: 784px) {
+		.toolbar {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+		}
+		.h1 {
+			font-size: 1.8rem;
+		}
+		.h2 {
+			font-size: 1rem;
+			text-align: center;
+		}
+		.about {
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+		.about-desc {
+			text-align: center;
+			font-size: 1rem;
+		}
+		.about-text {
+			font-size: 1.8rem;
+			text-align: center;
+		}
+		.desc-contact {
+			width: 100%;
+			text-align: center;
+		}
+		.desc-h1 {
+			width: 100%;
+			text-align: center;
+		}
 	}
 </style>

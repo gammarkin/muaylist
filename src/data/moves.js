@@ -42,3 +42,11 @@ export default [
         category: 'other'
     }
 ]
+
+export const getDefaultMove = (nextMoveId) => ({
+    id: nextMoveId,
+    src: '',
+    name: '',
+    desc: '',
+    category: '',
+})

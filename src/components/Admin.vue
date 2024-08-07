@@ -18,7 +18,9 @@
 	};
 
 	const goToNewMove = () => {
-		router.push(`admin/move/${moveStore.moves.length + 1}`);
+		router.push(
+			`admin/move/${moveStore.moves.reduce((a, b) => Math.max(a, b.id), 0) + 1}`
+		);
 	};
 
 	const changeToLanding = () => {

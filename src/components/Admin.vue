@@ -58,7 +58,6 @@
 			size="large"
 			tableStyle="width: 100vw"
 			:value="moveStore.moves"
-			:reorderableColumns="true"
 			@row-click="goToMoveId"
 			@rowReorder="onRowReorder"
 			@row-reorder="onRowReorder"

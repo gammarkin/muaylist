@@ -1,71 +1,53 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
 import defaultMoves from '../data/moves';
 
-export const useMoveStore = defineStore('moveStore', () => {
-
-    const visible = ref(false);
-    const editImage = ref(false)
-    const createVisible = ref(false)
-
-    const selectedMove = ref({});
-
-    const moves = ref(defaultMoves);
-
-
-    const openClose = () => {
-        createVisible.value = false
-        visible.value = !visible.value
-    }
-
-    const openCloseChangeImage = () => {
-        editImage.value = !editImage.value
-    }
-
-    const openCloseCreate = () => {
-        visible.value = false
-        createVisible.value = !createVisible.value
-    }
-
-    const setMoves = (newMoves) => {
-        moves.value = newMoves;
-    };
-
-    const removeMoveById = (id) => {
-        setMoves(moves.value.filter((move) => move.id !== id));
-    };
-
-    const addMove = (move) => {
-        setMoves([...moves.value, move]);
-    };
-
-    const editMove = (move) => {
-        if (move.id > moves.value.length + 1) {
-            return addMove(move);
-        }
-
-        const movesMinusChanged = moves.value.filter((m) => m.id !== move.id);
-
-        return setMoves([...movesMinusChanged, move]);
-    };
-
-    const setSelectedMove = (move) => {
-        selectedMove.value = move;
-    };
-
-    return {
-        moves,
-        visible,
-        editImage,
-        selectedMove,
-        createVisible,
-
-        addMove,
-        editMove,
-        openClose,
-        removeMoveById,
-        setSelectedMove,
-        openCloseCreate,
-        openCloseChangeImage,
-    };
+export const useMoveStore = defineStore({
+    id: 'moveStore',
+    state: () => ({
+        moves: defaultMoves,
+        visible: false,
+        editImage: false,
+        createVisible: false,
+        selectedMove: {},
+    }),
+    getters: {
+        getMoves: (state) => state.moves,
+        isVisible: (state) => state.visible,
+        isEditImage: (state) => state.editImage,
+        isCreateVisible: (state) => state.createVisible,
+        getSelectedMove: (state) => state.selectedMove,
+    },
+    actions: {
+        openClose() {
+            this.createVisible = false;
+            this.visible = !this.visible;
+        },
+        openCloseChangeImage() {
+            this.editImage = !this.editImage;
+        },
+        openCloseCreate() {
+            this.visible = false;
+            this.createVisible = !this.createVisible;
+        },
+        setMoves(newMoves) {
+            this.moves = newMoves;
+        },
+        removeMoveById(id) {
+            this.setMoves(this.moves.filter((move) => move.id !== id));
+        },
+        addMove(move) {
+            this.setMoves([...this.moves, move]);
+        },
+        editMove(move) {
+            const index = this.moves.findIndex((m) => m.id === move.id);
+            if (index !== -1) {
+                this.moves[index] = move;
+            } else {
+                this.addMove(move);
+            }
+        },
+        setSelectedMove(move) {
+            this.selectedMove = move;
+        },
+    },
 });
